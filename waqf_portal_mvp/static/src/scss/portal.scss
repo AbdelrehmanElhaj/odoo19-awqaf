@@ -1,0 +1,19 @@
+// Waqf Portal Custom Styles
+
+.o_portal {
+    .badge-lg {
+        font-size: 1.1em;
+        padding: 0.5em 1em;
+    }
+    
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .table {
+        thead th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+    }
+}

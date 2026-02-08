@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_waqf_beneficiary_portal,waqf.beneficiary.portal,model_waqf_beneficiary,group_portal_beneficiary,1,1,1,0
+access_waqf_beneficiary_officer,waqf.beneficiary.officer,model_waqf_beneficiary,group_case_officer,1,1,1,0
+access_waqf_beneficiary_committee,waqf.beneficiary.committee,model_waqf_beneficiary,group_committee_member,1,1,1,0
+access_waqf_beneficiary_finance,waqf.beneficiary.finance,model_waqf_beneficiary,group_finance,1,0,0,0
+access_waqf_beneficiary_auditor,waqf.beneficiary.auditor,model_waqf_beneficiary,group_auditor_readonly,1,0,0,0
+access_waqf_document_portal,waqf.beneficiary.document.portal,model_waqf_beneficiary_document,group_portal_beneficiary,1,1,1,1
+access_waqf_document_officer,waqf.beneficiary.document.officer,model_waqf_beneficiary_document,group_case_officer,1,1,1,1
+access_waqf_document_committee,waqf.beneficiary.document.committee,model_waqf_beneficiary_document,group_committee_member,1,1,1,0
+access_waqf_document_finance,waqf.beneficiary.document.finance,model_waqf_beneficiary_document,group_finance,1,0,0,0
+access_waqf_document_auditor,waqf.beneficiary.document.auditor,model_waqf_beneficiary_document,group_auditor_readonly,1,0,0,0

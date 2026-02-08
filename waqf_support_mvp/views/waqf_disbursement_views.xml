@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Disbursement Form View -->
+    <record id="view_waqf_disbursement_form" model="ir.ui.view">
+        <field name="name">waqf.disbursement.form</field>
+        <field name="model">waqf.disbursement</field>
+        <field name="arch" type="xml">
+            <form string="عملية الصرف">
+                <header>
+                    <button name="action_confirm" string="تأكيد" type="object"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"
+                            groups="waqf_registry.group_finance"/>
+                    <button name="action_mark_paid" string="تحديد كمدفوع" type="object"
+                            class="oe_highlight"
+                            invisible="state != 'confirmed'"
+                            groups="waqf_registry.group_finance"/>
+                    <button name="action_cancel" string="إلغاء" type="object"
+                            invisible="state in ['paid', 'cancelled']"
+                            groups="waqf_registry.group_finance"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="draft,confirmed,paid"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="application_id"/>
+                            <field name="beneficiary_id"/>
+                        </group>
+                        <group>
+                            <field name="amount" widget="monetary"/>
+                            <field name="disbursement_date"/>
+                            <field name="payment_method"/>
+                            <field name="reference"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                    <group string="معلومات التتبع" groups="base.group_no_one">
+                        <field name="disbursed_by"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Disbursement Tree View -->
+    <record id="view_waqf_disbursement_tree" model="ir.ui.view">
+        <field name="name">waqf.disbursement.tree</field>
+        <field name="model">waqf.disbursement</field>
+        <field name="arch" type="xml">
+            <tree string="عمليات الصرف">
+                <field name="name"/>
+                <field name="beneficiary_id"/>
+                <field name="amount" widget="monetary" sum="total_amount"/>
+                <field name="disbursement_date"/>
+                <field name="payment_method"/>
+                <field name="state" widget="badge" 
+                       decoration-success="state == 'paid'"
+                       decoration-info="state == 'confirmed'"
+                       decoration-muted="state == 'draft'"
+                       decoration-danger="state == 'cancelled'"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Disbursement Search View -->
+    <record id="view_waqf_disbursement_search" model="ir.ui.view">
+        <field name="name">waqf.disbursement.search</field>
+        <field name="model">waqf.disbursement</field>
+        <field name="arch" type="xml">
+            <search string="بحث عمليات الصرف">
+                <field name="name"/>
+                <field name="beneficiary_id"/>
+                <field name="application_id"/>
+                <separator/>
+                <filter name="filter_draft" string="مسودة" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_confirmed" string="مؤكد" domain="[('state', '=', 'confirmed')]"/>
+                <filter name="filter_paid" string="مدفوع" domain="[('state', '=', 'paid')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                    <filter name="group_beneficiary" string="المستفيد" context="{'group_by': 'beneficiary_id'}"/>
+                    <filter name="group_date" string="التاريخ" context="{'group_by': 'disbursement_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Disbursement Action -->
+    <record id="action_waqf_disbursement" model="ir.actions.act_window">
+        <field name="name">عمليات الصرف</field>
+        <field name="res_model">waqf.disbursement</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                لا توجد عمليات صرف بعد
+            </p>
+        </field>
+    </record>
+
+</odoo>

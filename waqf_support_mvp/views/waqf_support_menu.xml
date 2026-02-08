@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Support Menu -->
+    <menuitem id="menu_waqf_support" 
+              name="الدعم" 
+              parent="waqf_registry.menu_waqf_root" 
+              sequence="20"/>
+    
+    <menuitem id="menu_waqf_applications" 
+              name="طلبات الدعم" 
+              parent="menu_waqf_support" 
+              action="action_waqf_support_application" 
+              sequence="10"/>
+    
+    <!-- Finance Menu -->
+    <menuitem id="menu_waqf_finance" 
+              name="المالية"
+              parent="waqf_registry.menu_waqf_root" 
+          sequence="40"/>
+
+<menuitem id="menu_waqf_disbursements" 
+          name="عمليات الصرف" 
+          parent="menu_waqf_finance" 
+          action="action_waqf_disbursement" 
+          sequence="10"/>
+</odoo>

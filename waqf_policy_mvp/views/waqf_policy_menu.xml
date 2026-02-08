@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Policy Menu under main Waqf menu -->
+    <menuitem id="menu_waqf_policy" 
+              name="السياسات" 
+              parent="waqf_registry.menu_waqf_root" 
+              sequence="30"/>
+    
+    <menuitem id="menu_waqf_education_policy" 
+              name="سياسة الدعم التعليمي" 
+              parent="menu_waqf_policy" 
+              action="action_waqf_policy_dataset" 
+              sequence="10"/>
+
+</odoo>

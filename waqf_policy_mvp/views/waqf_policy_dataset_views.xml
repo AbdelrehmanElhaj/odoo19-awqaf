@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Dataset Form View -->
+    <record id="view_waqf_policy_dataset_form" model="ir.ui.view">
+        <field name="name">waqf.policy.dataset.form</field>
+        <field name="model">waqf.policy.dataset</field>
+        <field name="arch" type="xml">
+            <form string="مجموعة بيانات السياسة">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="policy_type"/>
+                        </group>
+                        <group>
+                            <field name="is_default"/>
+                            <field name="active"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description"/>
+                    </group>
+                    <notebook>
+                        <page string="صفوف البيانات" name="rows">
+                            <field name="row_ids">
+                                <tree editable="bottom">
+                                    <field name="study_level"/>
+                                    <field name="city_mode"/>
+                                    <field name="cap_education_fee" widget="monetary"/>
+                                    <field name="cap_monthly_stipend" widget="monetary"/>
+                                    <field name="notes"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Dataset Tree View -->
+    <record id="view_waqf_policy_dataset_tree" model="ir.ui.view">
+        <field name="name">waqf.policy.dataset.tree</field>
+        <field name="model">waqf.policy.dataset</field>
+        <field name="arch" type="xml">
+            <tree string="مجموعات بيانات السياسات">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="policy_type"/>
+                <field name="row_count"/>
+                <field name="is_default" widget="boolean_toggle"/>
+                <field name="active" widget="boolean_toggle"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Dataset Action -->
+    <record id="action_waqf_policy_dataset" model="ir.actions.act_window">
+        <field name="name">مجموعات بيانات السياسات</field>
+        <field name="res_model">waqf.policy.dataset</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                إنشاء مجموعة بيانات سياسة جديدة
+            </p>
+        </field>
+    </record>
+
+</odoo>

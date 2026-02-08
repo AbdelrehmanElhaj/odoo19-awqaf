@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Application Form View -->
+    <record id="view_waqf_support_application_form" model="ir.ui.view">
+        <field name="name">waqf.support.application.form</field>
+        <field name="model">waqf.support.application</field>
+        <field name="arch" type="xml">
+            <form string="طلب الدعم">
+                <header>
+                    <button name="action_submit" string="تقديم" type="object"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_verify" string="مراجعة" type="object"
+                            class="oe_highlight"
+                            invisible="state != 'submitted'"
+                            groups="waqf_registry.group_case_officer"/>
+                    <button name="action_evaluate_policy" string="تقييم السياسة" type="object"
+                            class="btn-primary"
+                            invisible="state != 'verified'"
+                            groups="waqf_registry.group_case_officer"/>
+                    <button name="action_send_to_committee" string="إرسال للجنة" type="object"
+                            class="oe_highlight"
+                            invisible="state != 'verified'"
+                            groups="waqf_registry.group_case_officer"/>
+                    <button name="action_approve" string="الموافقة" type="object"
+                            class="oe_highlight"
+                            invisible="state != 'in_committee'"
+                            groups="waqf_registry.group_committee_member"/>
+                    <button name="action_reject" string="رفض" type="object"
+                            invisible="state != 'in_committee'"
+                            groups="waqf_registry.group_committee_member"/>
+                    <button name="action_disburse" string="صرف" type="object"
+                            class="oe_highlight"
+                            invisible="state != 'approved'"
+                            groups="waqf_registry.group_finance"/>
+                    <button name="action_close" string="إغلاق" type="object"
+                            invisible="state != 'disbursed'"
+                            groups="waqf_registry.group_finance"/>
+                    <button name="action_reset_to_draft" string="إعادة إلى المسودة" type="object"
+                            invisible="state == 'draft'"
+                            groups="waqf_registry.group_case_officer"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="draft,submitted,verified,in_committee,approved,disbursed,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_lines" type="object"
+                                class="oe_stat_button" icon="fa-list">
+                            <field name="line_count" widget="statbutton" string="البنود"/>
+                        </button>
+                        <button name="action_view_disbursements" type="object"
+                                class="oe_stat_button" icon="fa-money">
+                            <field name="disbursement_count" widget="statbutton" string="الصرف"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="beneficiary_id"/>
+                            <field name="support_type"/>
+                        </group>
+                        <group>
+                            <field name="total_requested" widget="monetary"/>
+                            <field name="total_eligible" widget="monetary"/>
+                            <field name="policy_evaluated" invisible="1"/>
+                            <field name="policy_dataset_id" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="بنود الطلب" name="lines">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="line_type"/>
+                                    <field name="study_level"/>
+                                    <field name="city_mode"/>
+                                    <field name="requested_amount" widget="monetary" sum="total_requested"/>
+                                    <field name="eligible_amount" widget="monetary" sum="total_eligible" readonly="1"/>
+                                    <field name="notes"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="الموافقات" name="approvals">
+                            <field name="approval_ids" readonly="1">
+                                <tree>
+                                    <field name="decision" widget="badge"/>
+                                    <field name="approved_by"/>
+                                    <field name="approval_date"/>
+                                    <field name="notes"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="معلومات إضافية" name="extra_info">
+                            <group>
+                                <group string="الرفض">
+                                    <field name="rejection_reason" invisible="state != 'rejected'"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="معلومات التتبع" name="tracking" groups="base.group_no_one">
+                            <group>
+                                <group>
+                                    <field name="submitted_by"/>
+                                    <field name="submitted_at"/>
+                                    <field name="verified_by"/>
+                                    <field name="verified_at"/>
+                                </group>
+                                <group>
+                                    <field name="approved_by"/>
+                                    <field name="approved_at"/>
+                                    <field name="rejected_by"/>
+                                    <field name="rejected_at"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Application Tree View -->
+    <record id="view_waqf_support_application_tree" model="ir.ui.view">
+        <field name="name">waqf.support.application.tree</field>
+        <field name="model">waqf.support.application</field>
+        <field name="arch" type="xml">
+            <tree string="طلبات الدعم">
+                <field name="name"/>
+                <field name="beneficiary_id"/>
+                <field name="support_type"/>
+                <field name="total_requested" widget="monetary" sum="total_requested"/>
+                <field name="total_eligible" widget="monetary" sum="total_eligible"/>
+                <field name="state" widget="badge" 
+                       decoration-success="state == 'approved'"
+                       decoration-info="state == 'verified'"
+                       decoration-warning="state == 'submitted'"
+                       decoration-danger="state == 'rejected'"
+                       decoration-muted="state == 'draft'"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Application Kanban View -->
+    <record id="view_waqf_support_application_kanban" model="ir.ui.view">
+        <field name="name">waqf.support.application.kanban</field>
+        <field name="model">waqf.support.application</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="beneficiary_id"/>
+                <field name="total_eligible"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <field name="beneficiary_id"/>
+                                    <div>
+                                        المبلغ المستحق: <field name="total_eligible" widget="monetary"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Application Search View -->
+    <record id="view_waqf_support_application_search" model="ir.ui.view">
+        <field name="name">waqf.support.application.search</field>
+        <field name="model">waqf.support.application</field>
+        <field name="arch" type="xml">
+            <search string="بحث طلبات الدعم">
+                <field name="name"/>
+                <field name="beneficiary_id"/>
+                <separator/>
+                <filter name="filter_draft" string="مسودة" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_submitted" string="مقدم" domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_verified" string="مراجع" domain="[('state', '=', 'verified')]"/>
+                <filter name="filter_in_committee" string="في اللجنة" domain="[('state', '=', 'in_committee')]"/>
+                <filter name="filter_approved" string="موافق عليه" domain="[('state', '=', 'approved')]"/>
+                <filter name="filter_rejected" string="مرفوض" domain="[('state', '=', 'rejected')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                    <filter name="group_beneficiary" string="المستفيد" context="{'group_by': 'beneficiary_id'}"/>
+                    <filter name="group_support_type" string="نوع الدعم" context="{'group_by': 'support_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Application Action -->
+    <record id="action_waqf_support_application" model="ir.actions.act_window">
+        <field name="name">طلبات الدعم</field>
+        <field name="res_model">waqf.support.application</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                إنشاء طلب دعم جديد
+            </p>
+        </field>
+    </record>
+
+</odoo>

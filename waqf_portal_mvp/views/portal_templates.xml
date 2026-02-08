@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Portal Layout -->
+    <template id="portal_my_home" name="Portal My Home" inherit_id="portal.portal_my_home" priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">المستفيدون</t>
+                <t t-set="url" t-value="'/my/beneficiaries'"/>
+                <t t-set="placeholder_count" t-value="'beneficiary_count'"/>
+            </t>
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">طلبات الدعم</t>
+                <t t-set="url" t-value="'/my/applications'"/>
+                <t t-set="placeholder_count" t-value="'application_count'"/>
+            </t>
+        </xpath>
+    </template>
+    
+    <!-- Beneficiaries List -->
+    <template id="portal_my_beneficiaries" name="My Beneficiaries">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">المستفيدون</t>
+            </t>
+            
+            <div class="mb-3">
+                <a href="/my/beneficiary/new" class="btn btn-primary">
+                    <i class="fa fa-plus"/> تسجيل مستفيد جديد
+                </a>
+            </div>
+            
+            <t t-if="not beneficiaries">
+                <div class="alert alert-info">
+                    لا توجد سجلات مستفيدين بعد.
+                </div>
+            </t>
+            <t t-else="">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>رقم المستفيد</th>
+                                <th>الاسم</th>
+                                <th>رقم الهوية</th>
+                                <th>الحالة</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="beneficiaries" t-as="beneficiary">
+                                <td><span t-field="beneficiary.beneficiary_code"/></td>
+                                <td><span t-field="beneficiary.name"/></td>
+                                <td><span t-field="beneficiary.national_id"/></td>
+                                <td>
+                                    <span class="badge" t-att-class="'badge-success' if beneficiary.state == 'active' else 'badge-info'">
+                                        <t t-if="beneficiary.state == 'draft'">مسودة</t>
+                                        <t t-elif="beneficiary.state == 'submitted'">مقدم</t>
+                                        <t t-elif="beneficiary.state == 'verified'">مراجع</t>
+                                        <t t-elif="beneficiary.state == 'active'">نشط</t>
+                                    </span>
+                                </td>
+                                <td class="text-right">
+                                    <a t-attf-href="/my/beneficiary/#{beneficiary.id}" class="btn btn-sm btn-secondary">
+                                        عرض
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+            
+            <div t-if="pager" class="o_portal_pager text-center">
+                <t t-call="portal.pager"/>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Beneficiary Form -->
+    <template id="portal_beneficiary_form" name="Beneficiary Form">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <h3>تسجيل مستفيد جديد</h3>
+                <form action="/my/beneficiary/create" method="post" class="mt-4">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="name">الاسم الكامل *</label>
+                                <input type="text" class="form-control" name="name" required="required"/>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="national_id">رقم الهوية الوطنية *</label>
+                                <input type="text" class="form-control" name="national_id" required="required"/>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="category">الفئة *</label>
+                                <select class="form-control" name="category" required="required">
+                                    <option value="public">عام</option>
+                                    <option value="dhurri">ذري</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="phone">رقم الجوال *</label>
+                                <input type="text" class="form-control" name="phone" required="required"/>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email">البريد الإلكتروني</label>
+                                <input type="email" class="form-control" name="email"/>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="residence_city">مدينة الإقامة</label>
+                                <input type="text" class="form-control" name="residence_city"/>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="social_status">الحالة الاجتماعية</label>
+                                <select class="form-control" name="social_status">
+                                    <option value="">اختر...</option>
+                                    <option value="single">أعزب</option>
+                                    <option value="married">متزوج</option>
+                                    <option value="divorced">مطلق</option>
+                                    <option value="widowed">أرمل</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="dependents_count">عدد المعالين</label>
+                                <input type="number" class="form-control" name="dependents_count" value="0"/>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h4 class="mt-4">المعلومات البنكية</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="bank_name">اسم البنك</label>
+                                <input type="text" class="form-control" name="bank_name"/>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="iban">رقم الآيبان</label>
+                                <input type="text" class="form-control" name="iban"/>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="account_no">رقم الحساب</label>
+                                <input type="text" class="form-control" name="account_no"/>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="account_holder">اسم صاحب الحساب</label>
+                                <input type="text" class="form-control" name="account_holder"/>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="pledge_accepted" name="pledge_accepted" value="1" required="required"/>
+                            <label class="custom-control-label" for="pledge_accepted">
+                                أتعهد بصحة المعلومات المقدمة *
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">حفظ</button>
+                        <a href="/my/beneficiaries" class="btn btn-secondary">إلغاء</a>
+                    </div>
+                </form>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Beneficiary Detail -->
+    <template id="portal_beneficiary_detail" name="Beneficiary Detail">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3><span t-field="beneficiary.name"/></h3>
+                        <p>
+                            <strong>رقم المستفيد:</strong> <span t-field="beneficiary.beneficiary_code"/>
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <span class="badge badge-lg" t-att-class="'badge-success' if beneficiary.state == 'active' else 'badge-info'">
+                            <t t-if="beneficiary.state == 'draft'">مسودة</t>
+                            <t t-elif="beneficiary.state == 'submitted'">مقدم</t>
+                            <t t-elif="beneficiary.state == 'verified'">مراجع</t>
+                            <t t-elif="beneficiary.state == 'active'">نشط</t>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5>المعلومات الشخصية</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>رقم الهوية:</strong> <span t-field="beneficiary.national_id"/></p>
+                                <p><strong>الجوال:</strong> <span t-field="beneficiary.phone"/></p>
+                                <p><strong>البريد الإلكتروني:</strong> <span t-field="beneficiary.email"/></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>الفئة:</strong> <span t-field="beneficiary.category"/></p>
+                                <p><strong>مدينة الإقامة:</strong> <span t-field="beneficiary.residence_city"/></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>المرفقات</h5>
+                        <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#uploadModal">
+                            <i class="fa fa-upload"/> رفع مرفق
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <t t-if="not beneficiary.document_ids">
+                            <p class="text-muted">لا توجد مرفقات بعد</p>
+                        </t>
+                        <t t-else="">
+                            <div class="list-group">
+                                <div t-foreach="beneficiary.document_ids" t-as="doc" class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong><span t-field="doc.name"/></strong><br/>
+                                            <small class="text-muted"><span t-field="doc.document_type"/></small>
+                                        </div>
+                                        <a t-att-href="'/web/content/%s?download=true' % doc.attachment_id.id" class="btn btn-sm btn-secondary">
+                                            <i class="fa fa-download"/> تحميل
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Upload Modal -->
+            <div class="modal fade" id="uploadModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form t-attf-action="/my/beneficiary/#{beneficiary.id}/upload" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="modal-header">
+                                <h5 class="modal-title">رفع مرفق جديد</h5>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span>×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="document_name">اسم المرفق</label>
+                                    <input type="text" class="form-control" name="document_name" required="required"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="document_type">نوع المرفق</label>
+                                    <select class="form-control" name="document_type" required="required">
+                                        <option value="national_id_copy">صورة الهوية الوطنية</option>
+                                        <option value="bank_certificate">شهادة حساب بنكي</option>
+                                        <option value="family_record">صورة سجل الأسرة</option>
+                                        <option value="salary_certificate">تعريف راتب</option>
+                                        <option value="student_certificate">شهادة طالب</option>
+                                        <option value="medical_report">تقرير طبي</option>
+                                        <option value="other">أخرى</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="document">الملف</label>
+                                    <input type="file" class="form-control-file" name="document" required="required"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="notes">ملاحظات</label>
+                                    <textarea class="form-control" name="notes" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
+                                <button type="submit" class="btn btn-primary">رفع</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Applications List -->
+    <template id="portal_my_applications" name="My Applications">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">طلبات الدعم</t>
+            </t>
+            
+            <div class="mb-3">
+                <a href="/my/application/new" class="btn btn-primary">
+                    <i class="fa fa-plus"/> طلب دعم جديد
+                </a>
+            </div>
+            
+            <t t-if="not applications">
+                <div class="alert alert-info">
+                    لا توجد طلبات دعم بعد.
+                </div>
+            </t>
+            <t t-else="">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>رقم الطلب</th>
+                                <th>المستفيد</th>
+                                <th>المبلغ المستحق</th>
+                                <th>الحالة</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="applications" t-as="application">
+                                <td><span t-field="application.name"/></td>
+                                <td><span t-field="application.beneficiary_id.name"/></td>
+                                <td><span t-field="application.total_eligible" t-options="{'widget': 'monetary'}"/></td>
+                                <td>
+                                    <span class="badge" t-att-class="'badge-success' if application.state == 'approved' else 'badge-warning' if application.state == 'submitted' else 'badge-danger' if application.state == 'rejected' else 'badge-secondary'">
+                                        <t t-if="application.state == 'draft'">مسودة</t>
+                                        <t t-elif="application.state == 'submitted'">مقدم</t>
+                                        <t t-elif="application.state == 'verified'">مراجع</t>
+                                        <t t-elif="application.state == 'in_committee'">في اللجنة</t>
+                                        <t t-elif="application.state == 'approved'">موافق عليه</t>
+                                        <t t-elif="application.state == 'rejected'">مرفوض</t>
+                                        <t t-elif="application.state == 'disbursed'">تم الصرف</t>
+                                        <t t-elif="application.state == 'closed'">مغلق</t>
+                                    </span>
+                                </td>
+                                <td class="text-right">
+                                    <a t-attf-href="/my/application/#{application.id}" class="btn btn-sm btn-secondary">
+                                        عرض
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+            
+            <div t-if="pager" class="o_portal_pager text-center">
+                <t t-call="portal.pager"/>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Application Form -->
+    <template id="portal_application_form" name="Application Form">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <h3>طلب دعم تعليمي جديد</h3>
+                
+                <t t-if="not beneficiaries">
+                    <div class="alert alert-warning mt-4">
+                        يجب أن يكون لديك سجل مستفيد مفعّل قبل تقديم طلب دعم.
+                        <a href="/my/beneficiary/new" class="alert-link">سجل الآن</a>
+                    </div>
+                </t>
+                <t t-else="">
+                    <form action="/my/application/create" method="post" class="mt-4">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="line_count" id="line_count" value="1"/>
+                        
+                        <div class="form-group">
+                            <label for="beneficiary_id">المستفيد *</label>
+                            <select class="form-control" name="beneficiary_id" required="required">
+                                <option value="">اختر المستفيد...</option>
+                                <t t-foreach="beneficiaries" t-as="ben">
+                                    <option t-att-value="ben.id"><t t-esc="ben.name"/> (<t t-esc="ben.beneficiary_code"/>)</option>
+                                </t>
+                            </select>
+                        </div>
+                        
+                        <h4 class="mt-4">بنود الطلب</h4>
+                        <div id="lines_container">
+                            <div class="card mb-3 line-item" data-line-index="0">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>نوع البند *</label>
+                                                <select class="form-control" name="line_type_0" required="required">
+                                                    <option value="education_fee">رسوم دراسية</option>
+                                                    <option value="monthly_stipend">مكافأة شهرية</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>المستوى الدراسي *</label>
+                                                <select class="form-control" name="study_level_0" required="required">
+                                                    <option value="diploma">دبلوم</option>
+                                                    <option value="bachelor_theory">بكالوريوس نظري</option>
+                                                    <option value="bachelor_science">بكالوريوس علمي</option>
+                                                    <option value="master_theory">ماجستير نظري</option>
+                                                    <option value="master_science">ماجستير علمي</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>وضع السكن *</label>
+                                                <select class="form-control" name="city_mode_0" required="required">
+                                                    <option value="inside_city">داخل المدينة</option>
+                                                    <option value="outside_city">خارج المدينة</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>المبلغ المطلوب *</label>
+                                                <input type="number" class="form-control" name="requested_amount_0" step="0.01" required="required"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="addLine()">
+                                <i class="fa fa-plus"/> إضافة بند
+                            </button>
+                        </div>
+                        
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary">حفظ الطلب</button>
+                            <a href="/my/applications" class="btn btn-secondary">إلغاء</a>
+                        </div>
+                    </form>
+                    
+                    <script>
+                        let lineIndex = 1;
+                        function addLine() {
+                            const container = document.getElementById('lines_container');
+                            const newLine = `
+                                <div class="card mb-3 line-item" data-line-index="${lineIndex}">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>نوع البند *</label>
+                                                    <select class="form-control" name="line_type_${lineIndex}" required="required">
+                                                        <option value="education_fee">رسوم دراسية</option>
+                                                        <option value="monthly_stipend">مكافأة شهرية</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>المستوى الدراسي *</label>
+                                                    <select class="form-control" name="study_level_${lineIndex}" required="required">
+                                                        <option value="diploma">دبلوم</option>
+                                                        <option value="bachelor_theory">بكالوريوس نظري</option>
+                                                        <option value="bachelor_science">بكالوريوس علمي</option>
+                                                        <option value="master_theory">ماجستير نظري</option>
+                                                        <option value="master_science">ماجستير علمي</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>وضع السكن *</label>
+                                                    <select class="form-control" name="city_mode_${lineIndex}" required="required">
+                                                        <option value="inside_city">داخل المدينة</option>
+                                                        <option value="outside_city">خارج المدينة</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>المبلغ المطلوب *</label>
+                                                    <input type="number" class="form-control" name="requested_amount_${lineIndex}" step="0.01" required="required"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            container.insertAdjacentHTML('beforeend', newLine);
+                            document.getElementById('line_count').value = lineIndex + 1;
+                            lineIndex++;
+                        }
+                    </script>
+                </t>
+            </div>
+        </t>
+    </template>
+    
+    <!-- Application Detail -->
+    <template id="portal_application_detail" name="Application Detail">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3>طلب دعم <span t-field="application.name"/></h3>
+                        <p>
+                            <strong>المستفيد:</strong> <span t-field="application.beneficiary_id.name"/>
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <span class="badge badge-lg" t-att-class="'badge-success' if application.state == 'approved' else 'badge-warning' if application.state == 'submitted' else 'badge-danger' if application.state == 'rejected' else 'badge-secondary'">
+                            <t t-if="application.state == 'draft'">مسودة</t>
+                            <t t-elif="application.state == 'submitted'">مقدم</t>
+                            <t t-elif="application.state == 'verified'">مراجع</t>
+                            <t t-elif="application.state == 'in_committee'">في اللجنة</t>
+                            <t t-elif="application.state == 'approved'">موافق عليه</t>
+                            <t t-elif="application.state == 'rejected'">مرفوض</t>
+                            <t t-elif="application.state == 'disbursed'">تم الصرف</t>
+                            <t t-elif="application.state == 'closed'">مغلق</t>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="mt-3" t-if="application.state == 'draft'">
+                    <a t-attf-href="/my/application/#{application.id}/submit" class="btn btn-primary">
+                        <i class="fa fa-send"/> تقديم الطلب
+                    </a>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5>بنود الطلب</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>نوع البند</th>
+                                        <th>المستوى الدراسي</th>
+                                        <th>وضع السكن</th>
+                                        <th>المبلغ المطلوب</th>
+                                        <th>المبلغ المستحق</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="application.line_ids" t-as="line">
+                                        <td><span t-field="line.line_type"/></td>
+                                        <td><span t-field="line.study_level"/></td>
+                                        <td><span t-field="line.city_mode"/></td>
+                                        <td><span t-field="line.requested_amount" t-options="{'widget': 'monetary'}"/></td>
+                                        <td><span t-field="line.eligible_amount" t-options="{'widget': 'monetary'}"/></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="3">المجموع</th>
+                                        <th><span t-field="application.total_requested" t-options="{'widget': 'monetary'}"/></th>
+                                        <th><span t-field="application.total_eligible" t-options="{'widget': 'monetary'}"/></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-4" t-if="application.rejection_reason">
+                    <div class="card-header bg-danger text-white">
+                        <h5>سبب الرفض</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><span t-field="application.rejection_reason"/></p>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+</odoo>

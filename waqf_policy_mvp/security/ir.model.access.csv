@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_policy_dataset_officer,waqf.policy.dataset.officer,model_waqf_policy_dataset,waqf_registry.group_case_officer,1,1,1,0
+access_policy_dataset_committee,waqf.policy.dataset.committee,model_waqf_policy_dataset,waqf_registry.group_committee_member,1,0,0,0
+access_policy_dataset_finance,waqf.policy.dataset.finance,model_waqf_policy_dataset,waqf_registry.group_finance,1,0,0,0
+access_policy_dataset_auditor,waqf.policy.dataset.auditor,model_waqf_policy_dataset,waqf_registry.group_auditor_readonly,1,0,0,0
+access_policy_row_officer,waqf.policy.dataset.row.officer,model_waqf_policy_dataset_row,waqf_registry.group_case_officer,1,1,1,0
+access_policy_row_committee,waqf.policy.dataset.row.committee,model_waqf_policy_dataset_row,waqf_registry.group_committee_member,1,0,0,0
+access_policy_row_finance,waqf.policy.dataset.row.finance,model_waqf_policy_dataset_row,waqf_registry.group_finance,1,0,0,0
+access_policy_row_auditor,waqf.policy.dataset.row.auditor,model_waqf_policy_dataset_row,waqf_registry.group_auditor_readonly,1,0,0,0

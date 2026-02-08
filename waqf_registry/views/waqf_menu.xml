@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Main Menu -->
+    <menuitem id="menu_waqf_root" name="الوقف" sequence="10" web_icon="waqf_registry,static/description/icon.png"/>
+    
+    <!-- Registry Menu -->
+    <menuitem id="menu_waqf_registry" name="سجل المستفيدين" parent="menu_waqf_root" sequence="10"/>
+    
+    <menuitem id="menu_waqf_beneficiaries" 
+              name="المستفيدون" 
+              parent="menu_waqf_registry" 
+              action="action_waqf_beneficiary" 
+              sequence="10"/>
+
+</odoo>

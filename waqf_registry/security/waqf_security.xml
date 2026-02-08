@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <data noupdate="0">
+        
+        <!-- Categories -->
+        <record id="module_category_waqf" model="ir.module.category">
+            <field name="name">إدارة الوقف</field>
+            <field name="description">إدارة الوقف والمستفيدين</field>
+            <field name="sequence">10</field>
+        </record>
+        
+        <!-- Groups -->
+        <record id="group_portal_beneficiary" model="res.groups">
+            <field name="name">Beneficiary Portal User</field>
+            <field name="category_id" ref="module_category_waqf"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+        
+        <record id="group_case_officer" model="res.groups">
+            <field name="name">Case Officer</field>
+            <field name="category_id" ref="module_category_waqf"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_committee_member" model="res.groups">
+            <field name="name">Committee Member</field>
+            <field name="category_id" ref="module_category_waqf"/>
+            <field name="implied_ids" eval="[(4, ref('group_case_officer'))]"/>
+        </record>
+        
+        <record id="group_approver" model="res.groups">
+            <field name="name">Approver</field>
+            <field name="category_id" ref="module_category_waqf"/>
+            <field name="implied_ids" eval="[(4, ref('group_committee_member'))]"/>
+        </record>
+        
+        <record id="group_finance" model="res.groups">
+            <field name="name">Finance</field>
+            <field name="category_id" ref="module_category_waqf"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_auditor_readonly" model="res.groups">
+            <field name="name">Auditor (Read Only)</field>
+            <field name="category_id" ref="module_category_waqf"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <!-- Record Rules -->
+        
+        <!-- Portal users see only their own beneficiary records -->
+        <record id="waqf_beneficiary_portal_rule" model="ir.rule">
+            <field name="name">Portal User: Own Beneficiary Only</field>
+            <field name="model_id" ref="model_waqf_beneficiary"/>
+            <field name="domain_force">[('create_uid', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_portal_beneficiary'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+        
+        <!-- Case officers see all -->
+        <record id="waqf_beneficiary_officer_rule" model="ir.rule">
+            <field name="name">Case Officer: All Beneficiaries</field>
+            <field name="model_id" ref="model_waqf_beneficiary"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_case_officer'))]"/>
+        </record>
+        
+        <!-- Multi-company rule -->
+        <record id="waqf_beneficiary_company_rule" model="ir.rule">
+            <field name="name">Beneficiary: Multi-Company</field>
+            <field name="model_id" ref="model_waqf_beneficiary"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <!-- Document Rules -->
+        <record id="waqf_document_portal_rule" model="ir.rule">
+            <field name="name">Portal User: Own Documents Only</field>
+            <field name="model_id" ref="model_waqf_beneficiary_document"/>
+            <field name="domain_force">[('beneficiary_id.create_uid', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_portal_beneficiary'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        
+    </data>
+    
+</odoo>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Education Policy Dataset -->
+        <record id="dataset_education_policy_v1" model="waqf.policy.dataset">
+            <field name="name">سياسة الدعم التعليمي 2024</field>
+            <field name="code">education_policy_v1</field>
+            <field name="policy_type">education</field>
+            <field name="is_default" eval="True"/>
+            <field name="description">سياسة الدعم التعليمي للعام 2024 - الإصدار الأول</field>
+        </record>
+        
+        <!-- Policy Rows -->
+        <record id="policy_row_bachelor_theory_inside" model="waqf.policy.dataset.row">
+            <field name="dataset_id" ref="dataset_education_policy_v1"/>
+            <field name="study_level">bachelor_theory</field>
+            <field name="city_mode">inside_city</field>
+            <field name="cap_education_fee">15000.00</field>
+            <field name="cap_monthly_stipend">800.00</field>
+            <field name="notes">بكالوريوس نظري - داخل المدينة</field>
+        </record>
+        
+        <record id="policy_row_bachelor_theory_outside" model="waqf.policy.dataset.row">
+            <field name="dataset_id" ref="dataset_education_policy_v1"/>
+            <field name="study_level">bachelor_theory</field>
+            <field name="city_mode">outside_city</field>
+            <field name="cap_education_fee">15000.00</field>
+            <field name="cap_monthly_stipend">1200.00</field>
+            <field name="notes">بكالوريوس نظري - خارج المدينة</field>
+        </record>
+        
+        <record id="policy_row_bachelor_science_inside" model="waqf.policy.dataset.row">
+            <field name="dataset_id" ref="dataset_education_policy_v1"/>
+            <field name="study_level">bachelor_science</field>
+            <field name="city_mode">inside_city</field>
+            <field name="cap_education_fee">20000.00</field>
+            <field name="cap_monthly_stipend">1000.00</field>
+            <field name="notes">بكالوريوس علمي - داخل المدينة</field>
+        </record>
+        
+        <record id="policy_row_bachelor_science_outside" model="waqf.policy.dataset.row">
+            <field name="dataset_id" ref="dataset_education_policy_v1"/>
+            <field name="study_level">bachelor_science</field>
+            <field name="city_mode">outside_city</field>
+            <field name="cap_education_fee">20000.00</field>
+            <field name="cap_monthly_stipend">1500.00</field>
+            <field name="notes">بكالوريوس علمي - خارج المدينة</field>
+        </record>
+        
+        <record id="policy_row_master_theory_inside" model="waqf.policy.dataset.row">
+            <field name="dataset_id" ref="dataset_education_policy_v1"/>
+            <field name="study_level">master_theory</field>
+            <field name="city_mode">inside_city</field>
+            <field name="cap_education_fee">25000.00</field>
+            <field name="cap_monthly_stipend">1500.00</field>
+            <field name="notes">ماجستير نظري - داخل المدينة</field>
+        </record>
+        
+        <record id="policy_row_master_science_outside" model="waqf.policy.dataset.row">
+            <field name="dataset_id" ref="dataset_education_policy_v1"/>
+            <field name="study_level">master_science</field>
+            <field name="city_mode">outside_city</field>
+            <field name="cap_education_fee">30000.00</field>
+            <field name="cap_monthly_stipend">2000.00</field>
+            <field name="notes">ماجستير علمي - خارج المدينة</field>
+        </record>
+        
+    </data>
+</odoo>

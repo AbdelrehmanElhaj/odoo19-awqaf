@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Beneficiary Form View -->
+    <record id="view_waqf_beneficiary_form" model="ir.ui.view">
+        <field name="name">waqf.beneficiary.form</field>
+        <field name="model">waqf.beneficiary</field>
+        <field name="arch" type="xml">
+            <form string="المستفيد">
+                <header>
+                    <button name="action_submit" string="تقديم" type="object"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_verify" string="مراجعة والموافقة" type="object"
+                            class="oe_highlight"
+                            invisible="state != 'submitted'"
+                            groups="waqf_registry.group_case_officer"/>
+                    <button name="action_activate" string="تفعيل" type="object"
+                            class="oe_highlight"
+                            invisible="state != 'verified'"
+                            groups="waqf_registry.group_case_officer"/>
+                    <button name="action_deactivate" string="إلغاء التفعيل" type="object"
+                            invisible="state != 'active'"
+                            groups="waqf_registry.group_case_officer"/>
+                    <button name="action_reset_to_draft" string="إعادة إلى المسودة" type="object"
+                            invisible="state == 'draft'"
+                            groups="waqf_registry.group_case_officer"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="draft,submitted,verified,active"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_documents" type="object"
+                                class="oe_stat_button" icon="fa-file-text">
+                            <field name="document_count" widget="statbutton" string="المرفقات"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="beneficiary_code" readonly="1"/>
+                            <field name="name"/>
+                            <field name="national_id"/>
+                            <field name="category"/>
+                        </group>
+                        <group>
+                            <field name="phone"/>
+                            <field name="email"/>
+                            <field name="residence_city"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="المعلومات الاجتماعية">
+                        <group>
+                            <field name="social_status"/>
+                            <field name="dependents_count"/>
+                        </group>
+                    </group>
+                    <group string="المعلومات البنكية">
+                        <group>
+                            <field name="bank_name"/>
+                            <field name="iban"/>
+                        </group>
+                        <group>
+                            <field name="account_no"/>
+                            <field name="account_holder"/>
+                        </group>
+                    </group>
+                    <group string="التعهد">
+                        <group>
+                            <field name="pledge_accepted"/>
+                            <field name="pledge_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="المرفقات" name="documents">
+                            <field name="document_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="document_type"/>
+                                    <field name="file_name"/>
+                                    <field name="file_size" widget="integer"/>
+                                    <field name="create_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="معلومات التتبع" name="tracking" groups="base.group_no_one">
+                            <group>
+                                <group>
+                                    <field name="submitted_by"/>
+                                    <field name="submitted_at"/>
+                                </group>
+                                <group>
+                                    <field name="verified_by"/>
+                                    <field name="verified_at"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Beneficiary Tree View -->
+    <record id="view_waqf_beneficiary_tree" model="ir.ui.view">
+        <field name="name">waqf.beneficiary.tree</field>
+        <field name="model">waqf.beneficiary</field>
+        <field name="arch" type="xml">
+            <tree string="المستفيدين">
+                <field name="beneficiary_code"/>
+                <field name="name"/>
+                <field name="national_id"/>
+                <field name="category"/>
+                <field name="phone"/>
+                <field name="residence_city"/>
+                <field name="state" widget="badge" 
+                       decoration-success="state == 'active'"
+                       decoration-info="state == 'verified'"
+                       decoration-warning="state == 'submitted'"
+                       decoration-muted="state == 'draft'"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Beneficiary Search View -->
+    <record id="view_waqf_beneficiary_search" model="ir.ui.view">
+        <field name="name">waqf.beneficiary.search</field>
+        <field name="model">waqf.beneficiary</field>
+        <field name="arch" type="xml">
+            <search string="بحث المستفيدين">
+                <field name="name"/>
+                <field name="national_id"/>
+                <field name="beneficiary_code"/>
+                <field name="phone"/>
+                <separator/>
+                <filter name="filter_draft" string="مسودة" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_submitted" string="مقدم" domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_active" string="نشط" domain="[('state', '=', 'active')]"/>
+                <separator/>
+                <filter name="filter_dhurri" string="ذري" domain="[('category', '=', 'dhurri')]"/>
+                <filter name="filter_public" string="عام" domain="[('category', '=', 'public')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_category" string="الفئة" context="{'group_by': 'category'}"/>
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                    <filter name="group_city" string="المدينة" context="{'group_by': 'residence_city'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Document Form View -->
+    <record id="view_waqf_beneficiary_document_form" model="ir.ui.view">
+        <field name="name">waqf.beneficiary.document.form</field>
+        <field name="model">waqf.beneficiary.document</field>
+        <field name="arch" type="xml">
+            <form string="المرفق">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="document_type"/>
+                            <field name="beneficiary_id"/>
+                        </group>
+                        <group>
+                            <field name="attachment_id" widget="binary"/>
+                            <field name="file_name"/>
+                            <field name="file_size" widget="integer"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Beneficiary Action -->
+    <record id="action_waqf_beneficiary" model="ir.actions.act_window">
+        <field name="name">المستفيدون</field>
+        <field name="res_model">waqf.beneficiary</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                إضافة مستفيد جديد
+            </p>
+        </field>
+    </record>
+
+</odoo>
